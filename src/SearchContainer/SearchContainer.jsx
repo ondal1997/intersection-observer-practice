@@ -15,27 +15,28 @@ export default function SearchContainer() {
   const [totalCount, setTotalCount] = useState(null);
   const [fetchExecutor, isLoading] = usePromiseExecutor();
 
-  const handleInputQuery = ({ target }) => {
-    const { value } = target;
+  const handleInputQuery = (event) => {
+    const query = event.target.value;
 
-    setQuery(value);
+    setQuery(query);
     setPosts([]);
     setTotalCount(null);
 
-    if (!value) {
+    if (!query) {
       fetchExecutor.stop();
-      return;
+    } else {
+      const limit = LIMIT;
+      fetchPostsAndUpdateState({ query, limit });
     }
-
-    fetchPostsWithUpdateState({ query: value, limit: LIMIT });
   };
 
-  const fetchNextPostsWithUpdateState = () => {
+  const fetchNextPostsAndUpdateState = () => {
     const cursor = posts[posts.length - 1].id;
-    fetchPostsWithUpdateState({ query, cursor, limit: LIMIT });
+    const limit = LIMIT;
+    fetchPostsAndUpdateState({ query, cursor, limit });
   };
 
-  const fetchPostsWithUpdateState = (fetchPostsOption) => {
+  const fetchPostsAndUpdateState = (fetchPostsOption) => {
     const promise = fetchPosts(fetchPostsOption);
 
     const onFullfilled = ({ posts: fetchedPosts, totalCount: fetchedTotalCount }) => {
@@ -51,7 +52,6 @@ export default function SearchContainer() {
   };
 
   const isEnd = totalCount === null ? false : posts.length === totalCount;
-  const isSearching = !!query;
 
   return (
     <div>
@@ -59,7 +59,7 @@ export default function SearchContainer() {
       {posts.length > 0 && <PostList posts={posts} />}
       {isLoading && <div>로드 중...</div>}
       {isEnd && <div>끝</div>}
-      {isSearching && !isLoading && !isEnd && <Trigger onIntersect={fetchNextPostsWithUpdateState} />}
+      {!isLoading && !isEnd && query && <Trigger onIntersect={fetchNextPostsAndUpdateState} />}
     </div>
   );
 }
