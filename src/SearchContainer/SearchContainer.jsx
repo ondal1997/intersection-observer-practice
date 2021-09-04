@@ -34,7 +34,7 @@ export default function SearchContainer() {
     fetchPostsWithUpdateState({ query: value, limit: LIMIT });
   };
 
-  const fetchNextPosts = () => {
+  const fetchNextPostsWithUpdateState = () => {
     const cursor = posts[posts.length - 1].id;
     fetchPostsWithUpdateState({ query, cursor, limit: LIMIT });
   };
@@ -62,7 +62,7 @@ export default function SearchContainer() {
       <PostList posts={posts} />
       {isLoading && <div>로드 중...</div>}
       {isEnd && <div>끝</div>}
-      {query && !isLoading && !isEnd && <Trigger onIntersect={fetchNextPosts} />}
+      {query && !isLoading && !isEnd && <Trigger onIntersect={fetchNextPostsWithUpdateState} />}
     </div>
   );
 }
