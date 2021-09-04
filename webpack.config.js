@@ -1,31 +1,31 @@
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const webpack = require("webpack");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
-  mode: "development",
+  mode: 'development',
   module: {
     rules: [
       {
         test: /\.jsx?$/,
-        use: "babel-loader",
+        use: 'babel-loader',
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.png$/,
-        use: "file-loader",
+        use: 'file-loader',
       },
     ],
   },
   plugins: [
     new webpack.ProvidePlugin({
-      React: "react",
+      React: 'react',
     }),
-    new HtmlWebpackPlugin({ template: "./public/index.html", minify: true }),
+    new HtmlWebpackPlugin({ template: './public/index.html', minify: true }),
   ],
   resolve: {
-    extensions: [".js", ".jsx"],
+    extensions: ['.js', '.jsx'],
   },
 };
