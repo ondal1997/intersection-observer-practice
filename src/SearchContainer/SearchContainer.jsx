@@ -31,40 +31,29 @@ export default function SearchContainer() {
       return;
     }
 
-    setIsLoading(true);
-
-    const fetchPromise = fetchPosts({ query: value, limit: LIMIT });
-    lastFetchPromise.current = fetchPromise;
-
-    fetchPromise
-      .then(({ posts: fetchedPosts, totalCount: fetchedTotalCount }) => {
-        if (lastFetchPromise.current !== fetchPromise) return;
-        setIsLoading(false);
-        setPosts(fetchedPosts);
-        setTotalCount(fetchedTotalCount);
-      })
-      .catch(() => {
-        console.error('fetchPosts() 실패');
-      });
+    fetchPostsWithUpdateState({ query: value, limit: LIMIT });
   };
 
   const fetchNextPosts = () => {
+    const cursor = posts[posts.length - 1].id;
+    fetchPostsWithUpdateState({ query, cursor, limit: LIMIT });
+  };
+
+  const fetchPostsWithUpdateState = async (fetchPostsOption) => {
     setIsLoading(true);
 
-    const cursor = posts[posts.length - 1].id;
-    const fetchPromise = fetchPosts({ query, cursor, limit: LIMIT });
+    const fetchPromise = fetchPosts(fetchPostsOption);
     lastFetchPromise.current = fetchPromise;
 
-    fetchPromise
-      .then(({ posts: fetchedPosts, totalCount: fetchedTotalCount }) => {
-        if (lastFetchPromise.current !== fetchPromise) return;
-        setIsLoading(false);
-        setPosts([...posts, ...fetchedPosts]);
-        setTotalCount(fetchedTotalCount);
-      })
-      .catch(() => {
-        console.error('fetchPosts() 실패');
-      });
+    try {
+      const { posts: fetchedPosts, totalCount: fetchedTotalCount } = await fetchPromise;
+      if (lastFetchPromise.current !== fetchPromise) return;
+      setIsLoading(false);
+      setPosts((currentPosts) => [...currentPosts, ...fetchedPosts]);
+      setTotalCount(fetchedTotalCount);
+    } catch {
+      console.error('fetchPosts() 실패');
+    }
   };
 
   return (
